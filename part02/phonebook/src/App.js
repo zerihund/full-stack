@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from 'axios'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-12345", id: "1" },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filterQuery, setFilterQuery]= useState("")
+  useEffect(()=>{
+    axios.get("http://localhost:3008/persons").then(response=>{
+      setPersons(response.data)
+    })
+  },[])
   const addPerson = (event) => {
     event.preventDefault();
     if (persons.find(person=> person.name === newName)) {
@@ -20,31 +21,32 @@ const App = () => {
         number: newNumber,
       };
       setPersons(persons.concat(personObject));
-      setNewName("");
-      setNewNumber("");
+     // setNewName("");
+      //setNewNumber("");
     }
   };
 
-  const handleNameChange = (setValue) => (event) =>
-    setValue(event.target.value);
+  const handleChange=(setValue)=> {
+    return (event) => setValue(event.target.value);
+  }
   //setNewNumber(event.target.value)
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <p>filter shown with<input value={filterQuery} onChange={handleNameChange(setFilterQuery)}/></p>
+      <p>filter shown with<input value={filterQuery} onChange={handleChange(setFilterQuery)}/></p>
       <h2>add a new</h2>
       <form onSubmit={addPerson}>
         <div>
           <div>
             name:{" "}
-            <input value={newName} onChange={handleNameChange(setNewName)} />
+            <input value={newName} onChange={handleChange(setNewName)} />
           </div>
           <div>
             phone:
             <input
               value={newNumber}
-              onChange={handleNameChange(setNewNumber)}
+              onChange={handleChange(setNewNumber)}
             />
           </div>
         </div>
